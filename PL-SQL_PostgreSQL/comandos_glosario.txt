@@ -1,0 +1,380 @@
+/*
+COMANDOS SQL SHELL:
+
+\C transporte_publico          :posiciona el cursor en la base de datos mencionada
+\?                             :saber todos los comandos de "back slash"
+\l                             :mostrar todas las bases de datos 
+\dt                            :tablas de postgresql
+\dg                            :Lista todos los roles
+\d                             :describir una tabla
+\g                             :volver a ejecutar el comando anterior
+\du                            :Listar los usuarios y sus roles de la base de datos actual
+\df                            :Listar las funciones disponibles de la base de datos actual
+\dv                            :Listar las vistas de la base de datos actual
+\s                             :Ver el historial de comandos ejecutados
+\s                             :<nombre_archivo--  Si se quiere guardar la lista de comandos ejecutados en un archivo de texto plano
+\i <nombre_archivo--             :Ejecutar los comandos desde un archivo
+\e                             :Permite abrir un editor de texto plano, escribir comandos y ejecutar en lote. 
+\q                             :Cerrar la consola
+\h                             :Con este comando veremos la información de todas las consultas SQL
+\! cls                         :Limpiar pantalla
+---------------------------------------------------------------------------
+*/
+-- SQL: 
+
+-- Consultar version de postgresql
+SELECT VERSION();      
+
+-- SABER FECHA DEL SISTEMA CON MANIPULACIONM DE CADENA: TO_CHAR(expression, format)
+SELECT TO_CHAR(now(), 'DD-MM-YYYY HH12:MI:SS'); -- Mas info formatos: postgresql-to_char/
+
+-- crea una base de datos
+CREATE DATABASE nombre_db;     
+
+-- Crear tabla:
+CREATE TABLE tren (id serial NOT NULL, modelo character varying, capacidad integer, CONSTRAINT tren_pkey PRIMARY KEY (id));
+-- -- Crear tabla con PGADMIN:
+CREATE TABLE public.pasajero
+(
+    id serial,
+    nombre character varying(100),
+    direccion_res character varying,
+    fecha_nacimiento date,
+    CONSTRAINT pasajero_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+);
+ALTER TABLE public.pasajero
+    OWNER to postgres;
+
+
+-- Inserción de datos:
+INSERT INTO tren(modelo, capacidad) VALUES ('tesla 1', 7);
+
+INSERT INTO bitacora_pasajeros(bitacora_total, bitacora_time) VALUES (
+(SELECT  COUNT(*)
+FROM pasajeros),
+(SELECT  TO_CHAR(now(),'DD-MM-YYYY HH12:MI:SS')));
+
+
+-- Consultar todos los datos:
+SELECT * FROM tabla;
+
+-- Consultar datos con un determinado rango
+SELECT * FROM public.trenes ORDER BY id DESC LIMIT 100;
+
+-- Actualizar datos de TABLA:
+UPDATE tren SET modelo = 'tesla 2' WHERE id = 2; 
+
+-- Eliminar Datos:
+DELETE FROM tren WHERE id=3;   
+
+-- Encriptar un texto:
+SELECT MD5('Este texto sera encriptado');
+
+-- Creación de tabla con PGADMIN:
+CREATE DATABASE transporte WITH OWNER = postgres ENCODING = 'UTF8' CONNECTION LIMIT = -1;
+
+-- Consulta la fecha del sistema:
+SELECT current_date; #2019-10-03
+
+-- Creando una llave foranea:
+CONSTRAINT fk_Asignatura FOREIGN KEY (IdAsignatura) REFERENCES Asignatura (Id);
+
+ALTER TABLE trayectos ADD CONSTRAINT fk_tren_id FOREIGN KEY (tren_id) REFERENCES trenes (tren_id) MATCH SIMPLE
+ON UPDATE CASCADE
+ON DELETE CASCADE NOT VALID;
+
+-- Cambiar nombre de columna en tabla:
+ALTER TABLE nombre_tabla RENAME COLUMN actual_nombre_columna TO nuevo_nombre_columna;
+
+-- Consultar tablas de postgresql que no sean parte del motor
+SELECT tablename FROM pg_tables WHERE schemaname = 'public';
+
+-- Crear tabla con llaves primarias y foraneas:
+CREATE TABLE trayectos 
+  ( 
+     trayectos_id SERIAL NOT NULL, 
+     est_id       INT NOT NULL, 
+     tren_id      INT NOT NULL, 
+     trayect_nom  CHAR(50) NOT NULL, 
+     CONSTRAINT fk_est_id FOREIGN KEY (est_id) REFERENCES estaciones (est_id), 
+     CONSTRAINT fk_tren_id FOREIGN KEY (tren_id) REFERENCES trenes (tren_id), 
+     CONSTRAINT trayectos_pkey PRIMARY KEY (trayectos_id) MATCH SIMPLE
+     ON UPDATE CASCADE
+     ON DELETE CASCADE
+     NOT VALID;
+  );
+
+
+
+CREATE TABLE viajes
+(
+    viaje_id serial NOT NULL,
+    pasajero_id int NOT NULL,
+    trayecto_id int NOT NULL,
+    viaje_inicio time NOT NULL,
+    viaje_fin time NOT NULL,
+    viaje_fecha date NOT NULL,
+    CONSTRAINT viaje_id_pkey PRIMARY KEY (viaje_id),
+    CONSTRAINT fk_pasajero_id FOREIGN KEY (pasajero_id) REFERENCES pasajeros (pasajero_id),
+    CONSTRAINT fk_trayecto_id FOREIGN KEY (trayecto_id) REFERENCES trayectos (trayecto_id)
+    MATCH SIMPLE
+     ON UPDATE CASCADE
+     ON DELETE CASCADE
+     NOT VALID
+);
+
+-- Eliminar CONSTRAINT
+ALTER TABLE libros DROP CONSTRAINT CK_libros_precio_positivo;
+
+-- Vaciar datos de tabla con llaves foraneas en cascada
+TRUNCATE othertable CASCADE;
+TRUNCATE TABLE nombre_tabla RESTART IDENTITY; -- restablecer auto incrementar / sequence
+
+-- Añadir llave primaria a tabla:
+ALTER TABLE trayectos ADD PRIMARY KEY (trayectos_id);
+
+-- Crear tabla para particionar
+CREATE TABLE public.bitacora_viaje(
+    id serial,
+    id_viaje integer,
+    fecha date
+) PARTITION BY RANGE (fecha)
+WITH(
+    OIDS = FALSE
+);
+ALTER TABLE public.bitacora_viaje
+OWNER to postgres;
+
+-- Crear partición en tabla
+CREATE TABLE bitacora_viaje202001 PARTITION OF bitacora_viaje FOR VALUES FROM ('2020-01-01') TO ('2020-01-31');
+
+-- Insertar datos en particion
+INSERT INTO public.bitacora_viaje(
+    id_viaje, fecha)
+    VALUES(1, '2020-01-10');
+
+-- Eliminar tabla
+DROP TABLE films;
+
+-- Eliminar columna
+ALTER TABLE public.tren DROP COLUMN capacidad;
+
+-- Cear un ROL:
+CREATE ROLE usuario_consulta;
+
+-- Alterar ROL para que se pueda loguear a la DB:
+ALTER ROLE usuario_consulta WITH LOGIN NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+
+-- Alterar ROL para agregarle una CONTRASEÑA
+ALTER ROLE usuario_consulta WITH PASSWORD 'usuario_consulta':
+
+-- BORRAR UN USUARIO:
+DROP ROLE usuario_consulta;
+
+-- Agregar un usuario a una tabla con permisos de consulta, insert, update, delete
+
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.estaciones TO usuario_consulta;
+
+-- Revocar privilegios:
+REVOKE ALL PRIVILEGES ON DATABASE transporte_masivo FROM usuario_consulta;
+REVOKE ALL PRIVILEGES ON TABLE public.estaciones FROM usuario_consulta;  
+
+-- Otocargar acceso a la clase secuencia incremental para tablas a un rol
+GRANT USAGE, SELECT ON SEQUENCE trenes_id_seq TO usuario_consulta;  
+
+-- Saber que id tienen las DB de postgres
+SELECT datid,datname from pg_stat_database;
+
+-- JOIN o INNER JOIN
+SELECT * FROM pasajeros JOIN viajes ON (viajes.pasajero_id = pasajeros.pasajero_id); -- Saber que pasajeros han realizado al menos un viaje
+-- LEFT JOIN
+SELECT * FROM pasajeros LEFT JOIN viajes ON (pasajeros.pasajero_id = viajes.pasajero_id) WHERE viajes.pasajero_id IS NULL;  -- saber que pasajeros no han viajado
+
+-- CONSULTA ANIDADA CON INNER JOIN
+SELECT  *
+FROM TRENES
+WHERE tren_id = ( 
+SELECT  tren_id
+FROM pasajeros
+INNER JOIN trayectos
+ON (pasajeros.pasajero_id = 53 AND trayectos.trayecto_id = 5));
+
+
+-- COALESCE
+SELECT id, COALESCE(nombre, 'No Aplica') nombre, direccion, fecha_nac FROM public.pasajero WHERE id = 1; -- Retorna 'No aplica' ya que el nombre es nulo
+
+-- NULLIF
+SELECT NULLIF (0,0); -- Retorna Nulo
+
+-- GREATEST
+SELECT GREATEST (0,1,2,3,4,5,6); -- Retorna 6
+
+-- LEAST
+SELECT LEAST (0,1,2,3,4,5,6); -- Retorna 0
+
+-- Bloques anónimos:
+SELECT  id
+       ,nombre
+       ,direccion
+       ,fecha
+       ,CASE WHEN fecha > '2015-01-01' THEN 'Niño' ELSE 'Niña' END
+FROM public.pasajero;
+
+
+-- Que nombres de pasajeros comienzan su nombre por la M y quienes tienen mas de 24 años
+
+SELECT * FROM pasajeros WHERE pasajero_fecha_nacimiento < '1996-12-12' AND pasajero_nom ILIKE 'M%'; 
+
+SELECT  * 
+       ,CASE WHEN pasajero_fecha_nacimiento > '1996-01-02' THEN 'NIÑA' ELSE 'NIÑO' END AS SEXO
+FROM pasajeros; 
+
+-- LIKE % uno o cualquier valor _ un valor  I
+SELECT  *
+       ,CASE WHEN pasajero_nom LIKE 'O%'
+
+-- ILIKE, buscar entre mayus o minus:
+SELECT * FROM pasajeros WHERE pasajero_nom ILIKE 'And_es%'; 
+
+-- VISTAS VOLATIL
+CREATE OR REPLACE VIEW public.rango_view
+AS
+SELECT *, CASE WHEN fecha_nacimiento > '2015-01-01' THEN 'Mayor' ELSE 'Niño' END AS tipo FROM pasajeros ORDER BY tipo;
+ALTER TABLE public.rango_view OWNER TO postgres;
+-- VISTAS MATERIALIZADAS
+CREATE MATERIALIZED VIEW public.despues_noche_mview
+AS
+SELECT * FROM viaje WHERE inicio > '22:00:00'
+WITH NO DATA;
+-- LLENAR VISTA MATERIALIZADA
+REFRESH MATERIALIZED VIEW despues_noche_mview;
+
+-- Procedimiento almacenado PLPGSQL
+DO $$
+DECLARE
+rec record;
+contador integer := 0;
+BEGIN
+FOR rec IN SELECT * FROM pasajeros LOOP
+    RAISE NOTICE 'Un pasajero se llama %', rec.pasajero_nom;
+    contador := contador + 1;
+END LOOP;
+RAISE NOTICE 'Conteo es %', contador;
+END
+$$
+
+-- Crear o Editar procedimiento almacenado PLPGSQL
+CREATE OR REPLACE FUNCTION importantepl()
+RETURNS integer
+AS $$
+DECLARE
+rec record;
+contador integer := 0;
+BEGIN
+FOR rec IN SELECT * FROM pasajeros LOOP
+    RAISE NOTICE 'Un pasajero se llama %', rec.pasajero_nom;
+    contador := contador + 1;
+END LOOP;
+RAISE NOTICE 'Conteo es %', contador;
+RETURN contador;
+END
+$$
+LANGUAGE PLPGSQL;
+
+
+CREATE OR REPLACE FUNCTION importantepl() -- Funcion para Trigger
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS $BODY$
+DECLARE
+rec record;
+contador integer := 0;
+BEGIN
+FOR rec IN SELECT * FROM pasajeros LOOP
+    contador := contador + 1;
+END LOOP;
+RAISE NOTICE 'EL TRIGGER SE DISPARO CON #', contador;
+INSERT INTO bitacora_pasajeros(bitacora_total, bitacora_time) 
+VALUES ((SELECT  COUNT(*) FROM pasajeros), (SELECT  TO_CHAR(now(),'DD-MM-YYYY HH12:MI:SS')));
+RETURN NEW;
+END
+$BODY$;
+
+ALTER FUNCTION public.importantepl()
+    OWNER TO usuario_consulta;
+
+
+
+-- Consultar la PL creada
+SELECT importantepl();
+
+-- Triggers
+CREATE TRIGGER mitrigger
+AFTER DELETE
+ON pasajeros
+FOR EACH ROW
+EXECUTE PROCEDURE importantepl();
+
+-- Rename Trigger 
+ALTER TRIGGER mitrigger ON pasajeros
+RENAME TO pasajeros_trigger_insert;
+
+-- DB Remotas
+CREATE EXTENSION dblink; -- extension que usa postgresql para consultas a DB remotas
+
+SELECT * FROM dblink(
+    'dbname=remota
+    port=5432
+    host=127.0.0.1
+    user=usuario_consulta
+    password=usuario_consulta',
+    'SELECT * FROM pasajeros_vip;')
+	AS datos_remotos (pasajero_id integer, fecha_vip date);
+
+SELECT * FROM pasajeros
+JOIN
+dblink(
+    'dbname=remota
+    port=5432
+    host=127.0.0.1
+    user=usuario_consulta
+    password=usuario_consulta',
+    'SELECT * FROM pasajeros_vip;')
+	AS datos_remotos (pasajero_id integer, fecha_vip date)
+ON (pasajeros.pasajero_id = datos_remotos.pasajero_id); -- USING(pasajero_id);
+
+-- Transacciones
+BEGIN;
+
+INSERT INTO vip (id,fecha)
+VALUES (50,NOW());
+
+DO $$
+DECLARE 
+	rec record;
+	x integer := 0;
+BEGIN 
+	FOR rec IN
+		SELECT *
+		FROM vip
+	LOOP
+		x:= x+1;
+	END LOOP;
+	
+	IF 
+		x>3 THEN x=0;
+		ROLLBACK;
+	END IF;
+END 
+$$;
+
+COMMIT;
+
+
+-- Extension levenshtein
+CREATE EXTENSION fuzzystrmatch;
+SELECT levenshtein ('Andres','Andrez'); -- Retorna 1 que es la cantidad de letras que hay que cambiar
+

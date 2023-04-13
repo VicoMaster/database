@@ -1,0 +1,182 @@
+PostgreSQL:
+
+OpenSource
+Objeto-Relacional en su nucleo
+Usa SQL
+postgre: Geolocalización
+
+Cumple el estandar ACID: Atomicity-Consistency-Isolation-Durability (Atomicidad, Consistencia, Aislamiento, Durabilidad)
+
+• A: Atomicity – Atomicidad -> Separar las funciones desarrolladas en la BD como pequeñas tareas y ejecutarlas como un todo. Si alguna tarea falla se hace un rollback(Se deshacen los cambios)
+• C: Consistency – Consistencia -> Todo lo que se desarrolló en base al objeto relacional. Los datos tienen congruencia
+• I: Isolation – Aislamiento -> Varias tareas ejecutándose al mismo tiempo dentro de la BD
+• D: Durability – Durabilidad -> Puedes tener seguridad que la información no se perderá por un fallo catastrófico. PostgreSQL guarda la información en una Bitácora
+---------------------------------------------------------------------------
+USUARIOS:
+Por defecto: postgres - postgres123
+ABRIR DESDE LINUX: sudo -u postgres postgres123
+---------------------------------------------------------------------------
+Archivos problematicos/importantes:
+
+postgresql.conf    : Configuraciones globales de postgres
+pg_hba.conf        : Muestra los roles y tipos de acceso que se tienen a la DATABASE
+pg_ident.conf      : Nos permite mapear usuarios desde el sistema operativo a roles de DB
+
+---------------------------------------------------------------------------
+TIPOS DE DATOS:
+
+• Numéricos
+• Monetarios
+• Texto
+• Binarios
+• Fecha / Hora
+• Boolean
+
+ESPECIALES - Propios de PostgreSQL:
+
+• Geométricos: Permite usando X y Y calcular distancias y areas
+• Dirección de red: Almacena ips y permite hacer calculos de mascaras de red
+• Texto tipo bit: Permite hacer calculos en otros sistemas por ejemplo hexadecimal o binario
+• XML, JSON: Permite guardar este tipo de mensajes
+• Arreglos: Consiste en vectores y matrices. Se puede operar entre ellos.
+
+---------------------------------------------------------------------------
+
+Llaves primarias (PK): Nos permiten crear valores unicos con los cuales identificamos objetos dentro de una tabla. 
+Llaves foraneas (FK): Identifica una columna o grupo de columnas en una tabla que se refiere a una columna o grupo de columnas en otra tabla.
+
+---------------------------------------------------------------------------
+
+• Servidor de base de datos: Computador que tiene un motir de base de datos instalado y en ejecución 
+• Motor de base de datos: Software que provee un conjunto de servicios encargados de administrar una base de datos.
+• Base de datos: Grupo de datos que pertenecen a un mismo contexto.
+• Esquemas de base de datos en PostgreSQL: Grupo de objetos de base de datos que guarda relación entre si(tablas, funciones, relaciones, secuencias).
+• Tablas de base de datos: Estructura que organiza los datos en filas y columnas formando una matriz.+
+
+---------------------------------------------------------------------------
+ACCIONES DB
+
+• CREATE: Sirve para inicializar  la estructura de la tabla sin ningun tipo de dato 
+• ALTER: Cuando la tabla esta creada o tiene datos, sirve para crear o eliminar columnas, cambiar indices, agregar llaves primarias e inclusive agregar roles como propietarios de la tabla.
+• DROP: Borrar  la tabla con toda su  información o (DROP DATABASE base_datos) para borrar una base de datos no activa (con conexiones activas)
+
+---------------------------------------------------------------------------
+CONVENCIONES DE NOMBRES
+• Sintaxis del lenguaje PL-SQL en MAYUSCULA
+• nombres de bases de datos y tablas en minucula
+
+---------------------------------------------------------------------------
+PARTICIONES:
+
+• Separación fisica de datos.
+• Estructura Lógica
+• Para acceder a los datos se usa sin ninguna variación las consultas SQL
+• Con el mismo nombre de la tabla asigna otras pequeñas tablas que tienen un rango definido (fechas, horas)
+• No permiten llaves primarios ya que la idea es llenarlo con llaves primarios de otras tablas
+
+---------------------------------------------------------------------------
+ROLES:
+
+• Crear y eliminar roles (se pueden editar permisos de roles creados para esto)
+• Asignar atributos
+• agrupar con otros roles
+• Roles predeterminados
+• Los roles son independientes a la DB
+
+---------------------------------------------------------------------------
+LLLAVES FORANEAS:
+• La que proporciona la Consiste de nuestro ACID. Todas las tablas tienen relacion entre si y la información es congruente.
+• Tabla origen
+• Tabla destino
+• Acciones (NO ACTION, RESTRICT, CASCADE, SET NULL, SET DEFAULT)
+
+---------------------------------------------------------------------------
+Pagina para crear data de pruebas:
+https://mockaroo.com/
+
+---------------------------------------------------------------------------
+JOIN:
+Es toda la teoría de conjuntos implementada en SQL
+• JOIN (INNER)
+• LEFT [OUTER]
+• RIGHT [OUTER]
+• FULL OUTER
+
+---------------------------------------------------------------------------
+FUNCIONES ESPECIALES:
+• ON CONFLICT DO: Ayuda a solucionar problemas cuando queremos insertar o modificar datos en una tabla que no podamos y justamente despues se hace la actualización.
+• RETURNING: Devolver todos los cambios que hemos hecho sobre la base de datos, como en un insert todo los datos que fueron correctamente insertados.
+• LIKE / ILIKE: Sirve para hacer busqueda al estilo de expresiones regulares como que empiecen con "O" o terminen con la letra "Z"
+• IS/IS NOT: Para comparar 2 tipos de datos que no sean estandar como numero o alfa numerico, objeto, nullo...etc...
+
+---------------------------------------------------------------------------
+FUNCIONES ESPECIALES AVANZADAS:
+• COALESCE: Comparar 2 valores y retornar cual de los 2 no es nulo
+• NULLIF: Permite comparar 2 valores y retorna null si son iguales
+• GREATEST: Compara un arreglo de valores y retorna el mayor
+• LEAST: Compara un arreglo de valores y retorna el menor
+• BLOQUES ANÓNIMOS: Permite ingresar condicionales dentro de una consulta de DB
+
+---------------------------------------------------------------------------
+VISTAS
+Una vista es agarrar una consulta que se repite mucho y convertirla en un solo nombre
+
+• Vista Volatil:  Siempre que se haga la consulta la vista la DB hará la ejecución en la DB, por lo tanto siempre se tendra información actualizada.
+• Vista Materializada: Solo se hace la consulta 1 vez y el resultado se almacena en un modulo, y la siguiente que se consulte nuevamente traera este resultado de la memoria
+
+---------------------------------------------------------------------------
+PL/PgSQL (Procedural Language/PostgreSQL Structured Queary Language)
+ 
+• Procedimientos almacenados
+• Bloque de codigo en lenguaje PLPGSQL
+
+---------------------------------------------------------------------------
+TRIGGERS
+• Permiten ejecutar funciones dependiendo de acciones que se ejecuten en una tabla (Insert, update, delete)
+• Tienen 2 variables globales  OLD (deje el cambio como estaba antes de la intervencion)  y NEW 
+
+---------------------------------------------------------------------------
+DATOS EXTERNOS
+• Obtener datos de hosts remotos (dblink)
+• Extensión de PostgreSQL que no viene por defecto instalada
+
+---------------------------------------------------------------------------
+TRANSACCIONES
+• Prcesos complejos seguros
+• BEGIN <query>,COMMIT,ef ROLLBACK
+• Si alguno de los procesos seguros falla, tiene que devolver todos los cambios 
+
+---------------------------------------------------------------------------
+OTRAS EXTENSIONES PARA Postgres
+Sirven para hacer habilitar funciones que permiten hacer: Calculos, analisis, prototipado y ML
+https://www.postgresql.org/docs/11/contrib.html  -- Aqui se listan todas las extensiones de postgres
+• Distancia Levenshtein: Algoritmo matematico para comparar 2 palabras, la diferencia letra por letra. Retorna la cantidad de letras que hay que cambiar.
+• Diference: Comparar 2 palabras y la forma en la que suenan en ingles. Retorna un numero de 0 a 4, siendo 0 total mente diferente y 4 igual. 
+
+---------------------------------------------------------------------------
+BACKUPS Y RESTAURACION
+Servicios de restauración
+• pg_dump: Copia de seguridad
+• pg_restore: Restaurar desde 0
+
+---------------------------------------------------------------------------
+MANTENIMIENTO
+
+• VACUUM (full, freeze, analyze)
+• ANALYZE
+• REINDEX
+• CLUSTER
+
+PRINCIPAL LIMITACION DE RENDIMIENTO:
+IOPS (del inglés Input/Output Operations Per Second, operaciones de entrada/salida por segundo) 
+
+---------------------------------------------------------------------------
+REPLICAS
+https://app.cloudjiffy.co/
+• Configurar una Master para modificaciones y otra Slave para solo lectura
+• Configurar mas de 2 replicas para buenas practicas por posible crecimiento
+---------------------------------------------------------------------------
+BUENAS PRACTICAS
+• Evitar los bloqueos por inserciones y borrados en la misma tabla. Se utiliza con algo llamado renombrar tablas
+• 
+• 
