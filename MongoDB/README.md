@@ -5,4 +5,6 @@
 ## Documentos
     Podemos verla como si fueran las filas en las tablas relacionales. Es la entidad que queremos almacenar.
 ## Entidades
-    Son los "documentos" o "registros". Cada entidad en una base de datos NoSQL se representa mediante un documento o registro que contiene toda la información relacionada con esa entidad. Se representan en formato JSON.
+```
+Son los "documentos" o "registros". Cada entidad en una base de datos NoSQL se representa mediante un documento o registro que contiene toda la información relacionada con esa entidad. Se representan en formato JSON.
+```
