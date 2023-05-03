@@ -25,7 +25,7 @@ Son los "documentos" o "registros". Cada entidad en una base de datos NoSQL se r
 - $eq y $ne: Son operadores de comparación en MongoDB. El operador $eq se utiliza para comparar si un campo es igual a un valor específico. El operador $ne se utiliza para comparar si un campo no es igual a un valor específico. Ejemplo:
 
 ```
-db.usuarios.find({ edad: { $eq: 30 } })
-db.usuarios.find({ edad: { $ne: 30 } })
+    db.usuarios.find({ edad: { $eq: 30 } })
+    db.usuarios.find({ edad: { $ne: 30 } })
 ```
 
