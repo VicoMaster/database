@@ -1,2 +1,161 @@
 use("sample_training")
-db.zips.find({state: "NY"}).count()
+db.zips.find({ state: "NY" }).count()
+
+
+// Renombrado colecciones
+use("types_foods")
+db.ground.english.renameCollection("groundEnglish")
+db.ground.spanish.renameCollection("groundSpanish")
+
+// Consulta
+use("types_foods")
+db.groundSpanish.find({ category: "Granos y cereales" })
+
+
+// Eliminado de toda una colección con todos sus documentos
+use("sample_supplies")
+db.dropDatabase()
+
+// Eliminado de todos los documentos de una colection
+use("sample_airbnb")
+db.listingsAndReviews.drop()
+
+// Update Document
+use("types_foods")
+db.groundSpanish.find({ category: "Frutas y verduras" })
+db.groundSpanish.updateOne(
+    { category: "Frutas y verduras" },
+    {
+        $set: {
+            category: 'Frutas y verduritas'
+        }
+        //$inc -Operador para incrementar numeros
+    }
+    // Actualizar por ID --query
+    //{_id: ObjectId("0asmd901ksi2010ejx00wek2")}
+)
+
+
+// Update varios documentos
+use("sample_training")
+db.zips.find({ city: "CLEVELAND" }).count()
+
+
+use("sample_training")
+db.zips.updateMany(
+    { city: "CLEVELAND" },
+    {
+        $inc: {
+            pop: 100
+        },
+        // Crear un nuevo atributo
+        $set: {
+            nuevoAttr: "nuevito"
+        },
+        // Renombrar atributo
+        $rename: {
+            nuevoAttr: "renombradoAttr"
+        },
+        // Eliminar atributo
+        $unset: {
+            nuevoAttr: ""
+        }
+    }
+)
+
+use("types_foods")
+db.groundSpanish.updateMany(
+    {},
+    {
+        $rename: {
+            types: "examples"
+        }
+    }
+)
+db.groundEnglish.updateMany(
+    {},
+    {
+        $rename: {
+            types: "examples"
+        }
+    }
+)
+
+// Retornar solo los valores del array
+use("types_foods")
+db.groundSpanish.find(
+    { category: "Frutas y verduritas" },
+    { examples: 1, "_id": 0 }
+)
+
+// Añadir solo una fruta a la lista
+use("types_foods")
+db.groundSpanish.updateOne(
+    { category: "Frutas y verduritas" },
+    {
+        $push: {
+            examples: "Papaya"
+        }
+    }
+)
+
+// Añadir varias frutas a la lista
+use("types_foods")
+db.groundSpanish.updateOne(
+    { category: "Frutas y verduritas" },
+    {
+        $push: {
+            examples: {
+                $each: ["Piña", "Mango"]
+            }
+        }
+    }
+)
+
+// Eliminar una fruta de la lista
+use("types_foods")
+db.groundSpanish.updateOne(
+    { category: "Frutas y verduritas" },
+    {
+        $pull: {
+            examples: "Fresas"
+        }
+    }
+)
+
+
+// Eliminar varias frutas de la lista
+use("types_foods")
+db.groundSpanish.updateOne(
+    { category: "Frutas y verduritas" },
+    {
+        $pull: {
+            examples: {
+                $in: ["Piña", "Papaya"]
+            }
+        }
+    }
+)
+
+// Ejemplo para uso de upsert
+use('test_iot')
+db.iot.updateOne(
+    {
+        sensor: "A001",
+        date: "2023-05-03"
+    }, {
+    $push: {
+        readings: 1234
+    }
+}, {
+    upsert: true
+}
+)
+
+// Eliminar un documento especifico
+use('test_iot')
+db.iot.deleteOne(
+    {
+        _id: ObjectId('123')
+    }
+)

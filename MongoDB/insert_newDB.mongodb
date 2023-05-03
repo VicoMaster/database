@@ -1,0 +1,113 @@
+use("types_foods")
+
+db.ground.spanish.insertOne({
+    category: "Frutas y verduras",
+    types: [
+        "Manzanas",
+        "Plátanos",
+        "Fresas",
+        "Zanahorias",
+        "Brócoli",
+        "Tomates",
+        "Espinacas",
+        "Arándanos",
+        "Frambuesas",
+        "Moras"
+    ]
+})
+db.ground.spanish.insertOne({
+    category: "Granos y cereales",
+    types: [
+        "Arroz",
+        "Maíz",
+        "Frijoles",
+        "Lentejas",
+        "Garbanzos",
+        "Almendras",
+        "Cacahuetes",
+        "Semillas de girasol",
+        "Trigo",
+        "Avena",
+        "Pan integral",
+        "Pasta de trigo integral"
+    ]
+})
+db.ground.spanish.insertOne({
+    category: "Especias, hierbas y condimentos",
+    types: [
+        "Canela",
+        "Pimienta negra",
+        "Orégano",
+        "Tomillo",
+        "Romero",
+        "Cilantro",
+        "Comino",
+        "Jengibre",
+        "Cúrcuma",
+        "Ajo",
+        "Perejil"
+    ]
+})
+
+use("types_foods")
+db.ground.english.insertOne({
+    category: "Fruits and Vegetables",
+    types: [
+        "Apples",
+        "Bananas",
+        "Strawberries",
+        "Carrots",
+        "Broccoli",
+        "Tomatoes",
+        "Spinach",
+        "Blueberries",
+        "Raspberries",
+        "Blackberries"
+    ]
+})
+db.ground.english.insertOne({
+    category: "Grains and Cereals",
+    types: [
+        "Rice",
+        "Corn",
+        "Beans",
+        "Lentils",
+        "Chickpeas",
+        "Almonds",
+        "Peanuts",
+        "Sunflower seeds",
+        "Wheat",
+        "Oats",
+        "Whole wheat bread",
+        "Whole wheat pasta"
+    ]
+})
+db.ground.english.insertOne({
+    category: "Spices, Herbs, and Seasonings",
+    types: [
+        "Cinnamon",
+        "Black pepper",
+        "Oregano",
+        "Thyme",
+        "Rosemary",
+        "Cilantro",
+        "Cumin",
+        "Ginger",
+        "Turmeric",
+        "Garlic",
+        "Parsley"
+    ]
+})
+
+use("admin")
+db.user.insertOne({
+    access: "Super",
+    access: [
+        "create",
+        "update",
+        "delete",
+        "put",
+        "patch",
+        "get"
+    ]
+})

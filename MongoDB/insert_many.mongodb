@@ -1,0 +1,52 @@
+use("test_insert_many")
+
+db.groundSpanish.insertMany([
+    {
+        category: "Frutas y verduras",
+        types: [
+            "Manzanas",
+            "Plátanos",
+            "Fresas",
+            "Zanahorias",
+            "Brócoli",
+            "Tomates",
+            "Espinacas",
+            "Arándanos",
+            "Frambuesas",
+            "Moras"
+        ]
+    },
+    {
+        category: "Granos y cereales",
+        types: [
+            "Arroz",
+            "Maíz",
+            "Frijoles",
+            "Lentejas",
+            "Garbanzos",
+            "Almendras",
+            "Cacahuetes",
+            "Semillas de girasol",
+            "Trigo",
+            "Avena",
+            "Pan integral",
+            "Pasta de trigo integral"
+        ]
+    },
+    {
+        category: "Especias, hierbas y condimentos",
+        types: [
+            "Canela",
+            "Pimienta negra",
+            "Orégano",
+            "Tomillo",
+            "Romero",
+            "Cilantro",
+            "Comino",
+            "Jengibre",
+            "Cúrcuma",
+            "Ajo",
+            "Perejil"
+        ]
+    }
+])
