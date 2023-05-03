@@ -80,7 +80,7 @@ db.groundEnglish.updateMany(
         }
     }
 )
-
+// [PROJECTION]
 // Retornar solo los valores del array
 use("types_foods")
 db.groundSpanish.find(
@@ -159,3 +159,118 @@ db.iot.deleteOne(
         _id: ObjectId('123')
     }
 )
+
+// Si necesitamos buscar en un sub-documento
+// Es necesario agregar comillas para buscar por sub-documento.
+db.inventory.find({ "item.name": "ab" })
+db.trips.find(
+    { "start station location.type": "Point" }
+)
+// En sub documentos se puede consultar de la siguiente forma si sabemos un indice y atributos
+db.companies.find(
+    { "relationships.0.person.last_name": "Zuckerberg" },
+    {
+        name: 1,
+        relationships: 1
+    }
+)
+// Otra para encontrar todos los nombres que inicien con Mark
+db.companies.find({
+    relationships: {
+        $elemMatch: {
+            "person.first_name": "Mark"
+        }
+    }
+}, {
+    name: 1,
+    relationships: 1
+}
+)
+
+// $and y $or juntos.
+db.routes.find(
+    {
+        $and: [
+            { airplane: "E70" },
+            {
+                $or: [
+                    { dst_airport: "BOG" },
+                    { src_airport: "BOG" },
+                ]
+            }
+        ]
+    }
+)
+
+// AGREGACION / $expr <AVANZADO>
+/*
+   En este ejemplo, $expr se utiliza en la etapa $match para calcular la fecha límite de 3 meses a partir de la fecha actual utilizando la función $subtract. Luego, la etapa $match selecciona solo los documentos de ventas que ocurrieron en los últimos 3 meses, y la etapa $group calcula el promedio de la cantidad de ventas en esos documentos seleccionados.
+   Es importante tener en cuenta que $expr solo está disponible en las etapas de agregación, y no se puede utilizar en consultas regulares de lectura o escritura de datos.
+*/
+db.ventas.aggregate([
+    {
+        $match: {
+            $expr: { $gte: ["$fecha", { $subtract: [new Date(), 1000 * 60 * 60 * 24 * 90] }] }
+        }
+    },
+    {
+        $group: {
+            _id: null,
+            ventas_promedio: { $avg: "$cantidad" }
+        }
+    }
+])
+
+// Ejemplo simple (sin Aggregation Framework):
+// De manera expresiva decimos que traiga los documentos donde la variable $spent supere a $budget
+db.monthlyBudget.find(
+    {
+        $expr: {
+            $gte: ["$spent", "$budget"]
+        }
+    }
+)
+
+// Otro ejemplo (sin Aggregation Framework):
+// Compara los 2 atributos y trae los documentos donde el lugar de viaje de inicio sea igual al lugar de fin
+// y su duración fue de 1200 tiempo
+// Si se usa $expr se obliga a especificar todos operadores de forma expresiva
+use("sample_training")
+db.trips.find({
+    $expr: {
+        $and: [
+            { $eq: ["$start station id", "$end station id"] },
+            { $gte: ["$tripduration", 1200] }
+        ]
+    }
+})
+
+// Ejemplo simple de (Aggregation Framework)
+// El Aggregation funciona por capas. La salida de un pipeline es la entrada de otro
+// Busqueda y limpieza de información
+db.listingsAndReviews.aggregate([
+    { $match: { amenities: "Wifi" } }, // find <pipeline_1>
+    { $project: { address: 1 } },  // Projection <pipeline_2>
+    { $group: { _id: "$address.country", count: { $sum: 1 } } }  // Agrupacion por id <pipeline_3>
+])
+
+
+// Sort
+// 1 = 0-10, A-Z, ASC
+// -1 = 10 - 0, Z-A, DESC
+// Limit = máx de documentos
+db.zips
+    .find({ pop: { $gte: 100 } })
+    .sort({ pop: 1 })
+    .limit(2)
+
+
+// Skip (escapar) / offset = 0
+// Se usa para paginación. Si el find da 6 documentos y el limit es 2
+// el Skip debería aumentar para poder retornar los siguientes 2,4,6,8...etc
+db.categories
+    .find()
+    .skip(0)
+    .limit(2)
+
+
